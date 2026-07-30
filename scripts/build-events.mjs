@@ -1,16 +1,23 @@
 // Builds events.json for the ExpatWay app.
 //
-// Runs on GitHub's runners, NOT on a phone — which is the whole point. Both
-// sources refuse a plain mobile fetch: visitsaudi.com renders its list only in
-// JavaScript, and eyeofriyadh.com answers 403 to anything without a browser
-// user-agent. From here we can send a real UA and, for visitsaudi, hit the JSON
-// endpoint its own front end calls.
+// Runs on GitHub's runners, NOT on a phone — which is the whole point.
+// eyeofriyadh.com answers 403 to anything without a browser user-agent, so the
+// app can never read it directly. From here we can send a real UA.
 //
 // ⭐ IF A SCRAPE YIELDS ZERO ROWS THIS SCRIPT EXITS NON-ZERO AND COMMITS
 // NOTHING. A broken selector must never publish an empty feed over a good one:
 // the app would show every user an empty screen with no way to tell why. A
 // failed run leaves the previous events.json live and the app keeps working on
 // its 30-day cache.
+//
+// ⛔ VISIT SAUDI IS DELIBERATELY NOT A SOURCE.
+// visitsaudi.com renders its calendar entirely in JavaScript — the HTML holds
+// no event data at all — and it exposes no JSON endpoint: /api/events,
+// /bin/vs/*, .model.json and even /sitemap.xml all return 404. Reading it would
+// need a headless browser (Playwright) in this workflow. It is not worth that:
+// the seasons and festivals it would add are already in the app's curated
+// ksaEvents.js, and they are recurrence rules rather than published dates, so
+// they do not go stale. Do not re-add it without checking those URLs again.
 
 import { writeFileSync, readFileSync, existsSync } from 'node:fs';
 
@@ -18,9 +25,17 @@ const UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
   '(KHTML, like Gecko) Chrome/125.0 Safari/537.36';
 
-const get = async (url, headers = {}) => {
+// The listing is paginated at a FIXED 16 per page — `ipp` in the URL is ignored,
+// tested at 50/100/200. Events come soonest-first, so the early pages are the
+// ones worth having. 12 pages ≈ 190 events and keeps the run polite.
+const PAGES = 12;
+const PAGE_URL = (p) => `https://www.eyeofriyadh.com/events/index.php?&page=${p}&ipp=10`;
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+const get = async (url) => {
   const res = await fetch(url, {
-    headers: { 'User-Agent': UA, 'Accept-Language': 'en-US,en;q=0.9', ...headers },
+    headers: { 'User-Agent': UA, 'Accept-Language': 'en-US,en;q=0.9' },
     redirect: 'follow',
   });
   if (!res.ok) throw new Error(`${url} -> HTTP ${res.status}`);
@@ -34,113 +49,159 @@ const decode = (s = '') =>
     .replace(/&lt;/g, '<').replace(/&gt;/g, '>')
     .replace(/\s+/g, ' ').trim();
 
-const slug = (s) =>
-  s.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '').slice(0, 48);
+// ── Dates ────────────────────────────────────────────────────────────────────
+// ⚠️ Built from LOCAL components, never `toISOString()`. `new Date(...)` then
+// `.toISOString()` converts to UTC and hands back the previous day for any
+// timezone east of Greenwich. The runner happens to be UTC, but that is not
+// something to depend on.
+const MONTHS = { jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5, jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11 };
+const p2 = (n) => String(n).padStart(2, '0');
+const ymd = (y, m, d) => `${y}-${p2(m + 1)}-${p2(d)}`;
+const todayISO = () => {
+  const t = new Date();
+  return ymd(t.getFullYear(), t.getMonth(), t.getDate());
+};
+
+// Eye of Riyadh writes one of three shapes, always with a single trailing year:
+//   "26 Jan, 2027"           single day
+//   "25 - 27 Jan, 2027"      range inside one month
+//   "5 Aug - 22 Sep, 2026"   range across months
+// The year belongs to the END date, so a Dec->Jan range starts the year before.
+function parseRange(text) {
+  const t = String(text).replace(/\s+/g, ' ').trim();
+  const year = Number((t.match(/(\d{4})\s*$/) || [])[1]);
+  if (!year) return null;
+
+  let m = t.match(/^(\d{1,2})\s*[-–]\s*(\d{1,2})\s+([A-Za-z]{3})/);
+  if (m) {
+    const mo = MONTHS[m[3].toLowerCase()];
+    if (mo == null) return null;
+    return { start: ymd(year, mo, +m[1]), end: ymd(year, mo, +m[2]) };
+  }
+
+  m = t.match(/^(\d{1,2})\s+([A-Za-z]{3})[a-z]*\s*[-–]\s*(\d{1,2})\s+([A-Za-z]{3})/);
+  if (m) {
+    const mo1 = MONTHS[m[2].toLowerCase()];
+    const mo2 = MONTHS[m[4].toLowerCase()];
+    if (mo1 == null || mo2 == null) return null;
+    return { start: ymd(mo1 > mo2 ? year - 1 : year, mo1, +m[1]), end: ymd(year, mo2, +m[3]) };
+  }
+
+  m = t.match(/^(\d{1,2})\s+([A-Za-z]{3})/);
+  if (m) {
+    const mo = MONTHS[m[2].toLowerCase()];
+    if (mo == null) return null;
+    return { start: ymd(year, mo, +m[1]), end: ymd(year, mo, +m[1]) };
+  }
+  return null;
+}
 
 // ── Classification ───────────────────────────────────────────────────────────
-// Keyword-based because neither source publishes a category we can use. Add to
-// these as you spot events landing in the wrong bucket — an unmatched event
-// simply gets no industry, which is better than a wrong one.
-//
-// ⚠️ Keys MUST match EVENT_INDUSTRIES in the app's src/constants/ksaEvents.js.
+// ⚠️ Keys MUST match EVENT_TYPES in the app's src/constants/ksaEvents.js.
+// The site publishes its own type (Exhibition, Conference, Forum, Summit, Award,
+// Championship, "Professional Development Programme"…), which is far better than
+// guessing from the title — so this maps that vocabulary onto ours.
+function mapType(siteType, title) {
+  const t = `${siteType} ${title}`.toLowerCase();
+  if (/exhibition|expo|trade\s*show|fair/.test(t)) return 'exhibition';
+  if (/championship|cup|marathon|race|tournament|sport/.test(t)) return 'sports';
+  if (/festival|season|carnival/.test(t)) return 'festival';
+  if (/concert|music|live\s*show/.test(t)) return 'concert';
+  if (/conference|forum|summit|congress|seminar|award|programme|program|workshop|training/.test(t)) return 'conference';
+  return 'exhibition'; // it is an exhibitions listing; this is the safe default
+}
+
+// ⭐ The filter the app is actually for — an IT professional wants LEAP, an
+// engineer wants the construction show. Keyword-based because the site's own
+// categories are too coarse. Add to these as you spot events in the wrong
+// bucket; an unmatched event simply gets no industry, which is better than a
+// wrong one.
+// ⚠️ Keys MUST match EVENT_INDUSTRIES in src/constants/ksaEvents.js.
 const INDUSTRY_KEYWORDS = {
-  it: ['leap', 'tech', 'digital', 'software', 'ai ', 'artificial intelligence', 'cyber',
-    'data', 'cloud', 'telecom', 'gaming', 'gitex', 'fintech', 'blockchain', 'iot'],
-  engineering: ['engineering', 'engineer', 'manufactur', 'industrial', 'automation',
-    'machinery', 'welding', 'plant', 'maintenance'],
-  construction: ['construction', 'build', 'infrastructure', 'real estate', 'cityscape',
-    'architect', 'interior', 'concrete', 'hvac', 'project management'],
-  medical: ['health', 'medical', 'pharma', 'dental', 'hospital', 'clinic', 'care',
-    'medlab', 'nursing', 'biotech'],
-  energy: ['energy', 'oil', 'gas', 'petro', 'solar', 'renewable', 'power', 'utilities',
-    'hydrogen', 'water'],
-  finance: ['finance', 'financial', 'bank', 'invest', 'capital', 'insurance', 'fintech',
-    'trading', 'wealth'],
-  logistics: ['logistic', 'supply chain', 'transport', 'shipping', 'freight', 'maritime',
-    'aviation', 'ports', 'warehous'],
-  education: ['education', 'school', 'university', 'training', 'learning', 'academic',
-    'careers', 'recruitment'],
+  it: ['leap', 'deepfest', 'tech', 'digital', 'software', ' ai ', 'artificial intelligence', 'cyber',
+    'data', 'cloud', 'telecom', 'gaming', 'esports', 'fintech', 'blockchain', 'iot', 'proptech',
+    'innovation', 'electronics'],
+  engineering: ['engineering', 'engineer', 'manufactur', 'industrial', 'automation', 'machinery',
+    'welding', 'plant', 'maintenance', 'metal', 'plastic', 'printing', 'packaging'],
+  construction: ['construction', 'construct', 'build', 'infrastructure', 'real estate', 'cityscape',
+    'architect', 'interior', 'concrete', 'hvac', 'facilities', 'fm ', 'wood', 'stone', 'ceramic',
+    'lighting', 'glass'],
+  medical: ['health', 'medical', 'pharma', 'dental', 'hospital', 'clinic', 'medlab', 'nursing',
+    'biotech', 'laboratory', 'beauty', 'cosmetic'],
+  energy: ['energy', 'oil', 'gas', 'petro', 'solar', 'renewable', 'power', 'utilities', 'hydrogen',
+    'water', 'offshore', 'mining'],
+  finance: ['finance', 'financial', 'bank', 'invest', 'capital', 'insurance', 'trading', 'wealth',
+    'accounting', 'tax'],
+  logistics: ['logistic', 'supply chain', 'transport', 'shipping', 'freight', 'maritime', 'aviation',
+    'ports', 'warehous', 'procurement', 'rail'],
+  education: ['education', 'school', 'university', 'training', 'learning', 'academic', 'careers',
+    'recruitment', 'hr ', 'human resource', 'talent'],
 };
 
-// ⚠️ Keys MUST match EVENT_TYPES in src/constants/ksaEvents.js.
-const TYPE_KEYWORDS = {
-  exhibition: ['exhibition', 'expo', 'show', 'fair', 'trade'],
-  conference: ['conference', 'summit', 'forum', 'congress', 'symposium'],
-  festival: ['festival', 'season', 'carnival'],
-  concert: ['concert', 'live', 'tour', 'music'],
-  sports: ['championship', 'grand prix', 'cup', 'marathon', 'race', 'tournament'],
-};
-
-const classify = (map, text, multi = false) => {
-  const t = text.toLowerCase();
-  const hits = Object.entries(map)
+const classifyIndustry = (text) => {
+  const t = ` ${text.toLowerCase()} `;
+  return Object.entries(INDUSTRY_KEYWORDS)
     .filter(([, words]) => words.some((w) => t.includes(w)))
     .map(([k]) => k);
-  return multi ? hits : (hits[0] || null);
 };
 
-const CITIES = ['Riyadh', 'Jeddah', 'Dammam', 'Khobar', 'Makkah', 'Madinah',
-  'Mecca', 'Medina', 'Abha', 'Taif', 'Tabuk', 'AlUla', 'Neom'];
-const findCity = (text) =>
-  CITIES.find((c) => text.toLowerCase().includes(c.toLowerCase())) || '';
-
-// ⚠️ Built from LOCAL components, never `toISOString()`.
-// `new Date('12 March 2027')` is local midnight; `.toISOString()` then converts
-// to UTC and hands back 2027-03-11 for any timezone east of Greenwich. The
-// runner happens to be UTC today, but that is not something to depend on — and
-// this is the same class of bug the app's deeds log already had to fix.
-const iso = (d) => {
-  const t = new Date(d);
-  if (isNaN(t)) return null;
-  const p = (n) => String(n).padStart(2, '0');
-  return `${t.getFullYear()}-${p(t.getMonth() + 1)}-${p(t.getDate())}`;
-};
-
-// ── Source 1: Eye of Riyadh ──────────────────────────────────────────────────
-// Server-rendered HTML, so a regex pass over the card markup works. It 403s a
-// non-browser UA, which is exactly why this runs here and not in the app.
+// ── Source: Eye of Riyadh ────────────────────────────────────────────────────
+// ⚠️ SELECTORS — this is what breaks first when the site is redesigned. The
+// markup has NO semantic classes; every card is inline-styled divs, so these
+// patterns key off those inline styles. If a run fails with "no events", fetch
+// a page with the UA above, save the HTML, and re-derive from it. The shape as
+// of July 2026:
 //
-// ⚠️ SELECTOR — this is the part that will break first when the site is
-// redesigned. If the run fails with "no events", start by dumping `html` and
-// re-deriving this pattern.
-async function eyeOfRiyadh() {
-  const html = await get('https://www.eyeofriyadh.com/events/');
+//   <div style="margin-bottom:25px; ...">                        ← card wrapper
+//     <a href="/events/details/SLUG"><img ...></a>
+//     <div style="color:#666A73; padding:0px 10px 3px 10px;">30 Aug - 2 Sep, 2026</div>
+//     <div ...><a href="details/SLUG" style="...font-weight:700...">TITLE</a></div>
+//     <div style="color:#ADB0B6;...">VENUE , CITY | <a href="?fcat=N">TYPE</a></div>
+//     <div style="color:#666A73; margin-bottom:10px;">DESCRIPTION</div>
+//   </div>
+function parsePage(html) {
+  const flat = html.replace(/\n/g, ' ');
+  const cards = flat.split(/<div style="margin-bottom:25px/i).slice(1);
   const out = [];
 
-  const cards = html.split(/<div[^>]+class="[^"]*event[-_]?(?:box|card|item)[^"]*"/i).slice(1);
-  for (const raw of cards) {
-    const block = raw.slice(0, 4000);
-    const href = (block.match(/href="([^"]*\/events\/[^"]+)"/i) || [])[1];
-    const title = decode((block.match(/<h[234][^>]*>([\s\S]*?)<\/h[234]>/i) || [])[1] || '');
-    const dateText = decode((block.match(/(\d{1,2}\s+\w+\s+\d{4}[^<]{0,40})/) || [])[1] || '');
-    if (!title || !dateText) continue;
+  for (const block of cards) {
+    const titleM = block.match(/<a href="[^"]*details\/([^"]+)"[^>]*font-weight:700[^>]*>([\s\S]*?)<\/a>/);
+    if (!titleM) continue;
+    const urlSlug = titleM[1];
+    const title = decode(titleM[2]);
 
-    const parts = dateText.match(/\d{1,2}\s+\w+\s+\d{4}/g) || [];
-    const start = iso(parts[0]);
-    if (!start) continue;
-    const end = parts[1] ? iso(parts[1]) : start;
+    const dateM = block.match(/<div style="color:#666A73;\s*padding:0px 10px 3px 10px;">([^<]+)<\/div>/);
+    const range = dateM ? parseRange(decode(dateM[1])) : null;
+    if (!title || !range) continue;
 
-    const venue = decode((block.match(/venue[^>]*>([^<]{3,80})</i) || [])[1] || '');
-    const context = `${title} ${venue} ${block.slice(0, 600)}`;
+    // "Venue , City | <a>Type</a>"
+    const locRaw = (block.match(/<div style="color:#ADB0B6;[^"]*">([\s\S]*?)<\/div>/) || [])[1] || '';
+    const siteType = decode((locRaw.match(/fcat=\d+"[^>]*>([^<]+)<\/a>/) || [])[1] || '');
+    const place = decode(locRaw.replace(/<a[\s\S]*$/, '')).replace(/\|\s*$/, '').trim();
+    const bits = place.split(',').map((x) => x.trim()).filter(Boolean);
+    const city = bits.length > 1 ? bits[bits.length - 1] : '';
+    const venue = bits.length > 1 ? bits.slice(0, -1).join(', ') : place;
+
+    const desc = decode((block.match(/<div style="color:#666A73;\s*margin-bottom:10px;">([\s\S]*?)<\/div>/) || [])[1] || '');
 
     out.push({
-      key: `eor_${slug(title)}_${start}`,
+      key: `eor_${urlSlug}_${range.start}`,
       source: 'eyeofriyadh',
       title,
       organizer: '',
-      city: findCity(context),
+      city,
       venue,
-      start,
-      end,
-      type: classify(TYPE_KEYWORDS, title) || 'exhibition',
-      industry: classify(INDUSTRY_KEYWORDS, context, true),
+      start: range.start,
+      end: range.end,
+      type: mapType(siteType, title),
+      // Classified on clean text, not raw HTML — style attributes and venue
+      // names were adding false matches.
+      industry: classifyIndustry(`${title} ${desc} ${siteType}`),
       category: 'business',
       tier: 2,
-      desc: '',
+      desc: desc.slice(0, 240),
       plan: '',
-      url: href
-        ? (href.startsWith('http') ? href : `https://www.eyeofriyadh.com${href}`)
-        : 'https://www.eyeofriyadh.com/events/',
+      url: `https://www.eyeofriyadh.com/events/details/${urlSlug}`,
       icon: 'calendar-star',
       color: '#0EA5E9',
     });
@@ -148,62 +209,32 @@ async function eyeOfRiyadh() {
   return out;
 }
 
-// ── Source 2: Visit Saudi ────────────────────────────────────────────────────
-// The page itself is a JS shell with no event data in its HTML. Its front end
-// calls a search API, which is what we hit instead. If this endpoint moves, the
-// fallback is to drop this source — Eye of Riyadh alone still fills the feed,
-// which is why a failure here warns rather than throws.
-async function visitSaudi() {
-  const url = 'https://www.visitsaudi.com/bin/vs/search?types=events&locale=en&limit=100';
-  let json;
-  try {
-    json = JSON.parse(await get(url, { Accept: 'application/json' }));
-  } catch (e) {
-    console.warn(`visitsaudi: ${e.message} - continuing without it`);
-    return [];
+async function eyeOfRiyadh() {
+  const all = [];
+  for (let p = 1; p <= PAGES; p++) {
+    try {
+      const rows = parsePage(await get(PAGE_URL(p)));
+      console.log(`page ${p}: ${rows.length} events`);
+      // A page yielding nothing means we ran past the end, or the markup moved.
+      // Either way there is no point hammering the remaining pages.
+      if (!rows.length) break;
+      all.push(...rows);
+    } catch (e) {
+      console.warn(`page ${p} failed: ${e.message}`);
+    }
+    await sleep(400); // be polite
   }
-
-  const rows = json?.results || json?.items || json?.data || [];
-  return rows.map((r) => {
-    const title = decode(r.title || r.name || '');
-    const start = iso(r.startDate || r.start);
-    if (!title || !start) return null;
-    const context = `${title} ${r.description || ''} ${r.location || ''}`;
-    return {
-      key: `vs_${slug(title)}_${start}`,
-      source: 'visitsaudi',
-      title,
-      organizer: 'Visit Saudi',
-      city: findCity(context) || decode(r.city || r.location || ''),
-      venue: decode(r.venue || ''),
-      start,
-      end: iso(r.endDate || r.end) || start,
-      type: classify(TYPE_KEYWORDS, title) || 'festival',
-      industry: classify(INDUSTRY_KEYWORDS, context, true),
-      category: 'culture',
-      tier: 2,
-      desc: decode(r.description || '').slice(0, 240),
-      plan: '',
-      url: String(r.url || '').startsWith('http') ? r.url : 'https://www.visitsaudi.com/en/saudi-calendar',
-      icon: 'ferris-wheel',
-      color: '#DB2777',
-    };
-  }).filter(Boolean);
+  return all;
 }
 
 // ── Build ────────────────────────────────────────────────────────────────────
-// allSettled, not all: one source dying must not take the other down with it.
-const settled = await Promise.allSettled([eyeOfRiyadh(), visitSaudi()]);
-settled.forEach((r, i) => {
-  if (r.status === 'rejected') console.warn(`source ${i} failed: ${r.reason?.message}`);
-});
+const scraped = await eyeOfRiyadh();
 
-const today = iso(new Date());
+const today = todayISO();
 const seen = new Set();
-const events = settled
-  .flatMap((r) => (r.status === 'fulfilled' ? r.value : []))
-  // Drop anything already over — the app would filter it out anyway, and the
-  // file stays small.
+const events = scraped
+  // Drop anything already finished — the app filters it out anyway and the file
+  // stays small.
   .filter((e) => (e.end || e.start) >= today)
   .filter((e) => (seen.has(e.key) ? false : seen.add(e.key)))
   .sort((a, b) => a.start.localeCompare(b.start))
@@ -211,17 +242,17 @@ const events = settled
 
 // ⭐ The guard. Never overwrite a good feed with an empty one.
 if (!events.length) {
-  console.error('No events scraped from any source - refusing to write an empty feed.');
-  console.error('A selector has probably changed. Dump the HTML and re-derive it.');
+  console.error('No events scraped - refusing to write an empty feed.');
+  console.error('A selector has probably changed. Fetch a page with the UA in this file,');
+  console.error('save the HTML, and re-derive the patterns in parsePage().');
   process.exit(1);
 }
 
 // A collapse to a fraction of the previous size is the same failure in slow
-// motion — one source silently dying. Fail rather than quietly halve the feed.
+// motion — the markup half-changed. Fail rather than quietly gut the feed.
 if (existsSync('events.json')) {
   try {
-    const prev = JSON.parse(readFileSync('events.json', 'utf8'));
-    const prevCount = prev?.events?.length || 0;
+    const prevCount = JSON.parse(readFileSync('events.json', 'utf8'))?.events?.length || 0;
     if (prevCount > 20 && events.length < prevCount * 0.4) {
       console.error(`Only ${events.length} events vs ${prevCount} last time - refusing to publish.`);
       process.exit(1);
@@ -230,4 +261,7 @@ if (existsSync('events.json')) {
 }
 
 writeFileSync('events.json', JSON.stringify({ generated: today, events }, null, 2) + '\n');
-console.log(`Wrote ${events.length} events.`);
+console.log(`\nWrote ${events.length} events.`);
+const byIndustry = {};
+for (const e of events) for (const i of e.industry) byIndustry[i] = (byIndustry[i] || 0) + 1;
+console.log('By field:', JSON.stringify(byIndustry));
