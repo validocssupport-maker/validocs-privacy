@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset='utf-8'>
   <meta name='viewport' content='width=device-width'>
@@ -7,6 +7,7 @@
   <style>
     body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 1.5em; max-width: 800px; margin: 0 auto; color: #333; line-height: 1.7; }
     h1 { color: #0F172A; border-bottom: 3px solid #10B981; padding-bottom: 0.3em; }
+    h2 { color: #0F172A; margin-top: 1.8em; }
     strong { color: #0F172A; }
     a { color: #10B981; }
     ul { padding-left: 1.5em; }
@@ -15,183 +16,328 @@
     .section { margin-bottom: 1.5em; }
     .footer { color: #94A3B8; font-size: 0.85em; text-align: center; }
     .badge { background: #F0FDF4; border-left: 4px solid #10B981; padding: 0.8em 1em; border-radius: 0 8px 8px 0; margin: 0.5em 0; }
+    /* Added for the outbound-requests table. The table is the one piece of the
+       policy that needs horizontal room on a phone, so it scrolls in its own
+       box rather than forcing the whole page sideways. */
+    .tablewrap { overflow-x: auto; margin: 1em 0; }
+    table { border-collapse: collapse; width: 100%; font-size: 0.92em; }
+    th, td { border: 1px solid #E2E8F0; padding: 0.55em 0.7em; text-align: left; vertical-align: top; }
+    th { background: #F8FAFC; color: #0F172A; }
   </style>
 </head>
 <body>
 
 <h1>Privacy Policy</h1>
-<p>This privacy policy applies to the <strong>ExpatWay - KSA Expat Companion</strong> app for Android mobile devices, operated by <strong>Salman Aslam</strong> (the "Service Provider"). This policy is effective as of <strong>2026-06-08</strong>.</p>
-
-<div class="badge">ExpatWay is a document expiry tracking and reminder app built specifically for expats living in Saudi Arabia. The app helps you track Iqama, Passport, SCE membership, SOCPA membership, SCFHS licence, Ejar rental contracts, Driving Licence, Istimara, Fahas, and other personal and family documents.</div>
-
-<br>
-<div class="section">
-<strong>What Information We Collect</strong>
-<p>The Application collects the following information:</p>
-<ul>
-  <li>Your <strong>email address and display name</strong> — when you create an account or sign in with Google</li>
-  <li><strong>Document information</strong> you voluntarily enter — document types, expiry dates, document numbers, and notes</li>
-  <li><strong>Profile photos</strong> you voluntarily upload for family members</li>
-  <li><strong>Document images</strong> you voluntarily attach to your document records</li>
-  <li>Your device's Internet Protocol (IP) address</li>
-  <li>Your mobile operating system and device information</li>
-  <li>Time and date of app usage</li>
-</ul>
-</div>
 
 <div class="section">
-<strong>How We Use Your Information</strong>
-<p>The information collected is used solely to:</p>
-<ul>
-  <li>Provide document expiry tracking and reminder functionality</li>
-  <li>Schedule and deliver push notification alerts before your documents expire</li>
-  <li>Enable cloud backup and restore of your document data across devices</li>
-  <li>Allow you to manage family and team member documents within the app</li>
-  <li>Improve the Application's performance and functionality</li>
-</ul>
-</div>
-
-<div class="section">
-<strong>Local Storage</strong>
-<p>All document data you enter is stored locally on your device using AsyncStorage (device local storage). This data remains on your device and is not transmitted externally unless you explicitly choose to enable cloud backup. Local data includes your document records, member profiles, workspace settings, theme preferences, and notification settings.</p>
-</div>
-
-<div class="section">
-<strong>Cloud Backup (Optional)</strong>
-<p>Cloud backup is entirely optional. It is only activated when you choose to sign in and use the backup feature. When cloud backup is enabled:</p>
-<ul>
-  <li>Your document details are securely stored in Google Firebase Firestore under your unique user account</li>
-  <li>Each user's data is isolated — only accessible through their authenticated account</li>
-  <li><strong>Document images are stored on your device only and are never uploaded to the cloud</strong></li>
-  <li>Cloud data can be restored to any device by signing in with the same account</li>
-</ul>
-</div>
-
-<div class="section">
-<strong>Google Sign-In</strong>
-<p>The Application offers optional sign-in using Google Sign-In, a service provided by Google LLC. When you use Google Sign-In:</p>
-<ul>
-  <li>Google processes your authentication in accordance with <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google's Privacy Policy</a></li>
-  <li>The Service Provider receives only your <strong>name and email address</strong> from Google to create and manage your account within ExpatWay</li>
-  <li>The Service Provider does not receive or store your Google password</li>
-  <li>You can revoke Google Sign-In access at any time from your Google Account settings</li>
-</ul>
-</div>
-
-<div class="section">
-<strong>Push Notifications</strong>
-<p>The Application uses locally scheduled push notifications to alert you before your documents expire. These notifications are scheduled directly on your device — they do not require sending your personal data to external servers. Notification permission is requested on first launch and can be withdrawn at any time through your device Settings.</p>
-</div>
-
-<div class="section">
-<strong>Third Party Services</strong>
-<p>The Application uses the following third-party services, each governed by their own privacy policies:</p>
-<ul>
-  <li><a href="https://www.google.com/policies/privacy/" target="_blank" rel="noopener noreferrer">Google Play Services</a> — required for Android app functionality</li>
-  <li><a href="https://firebase.google.com/support/privacy" target="_blank" rel="noopener noreferrer">Google Firebase (Authentication and Firestore Database)</a> — used for account authentication and optional cloud backup</li>
-  <li><a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google Sign-In</a> — optional authentication method</li>
-</ul>
-</div>
-
-<div class="section">
-<strong>Cookies and Tracking Technologies</strong>
-<p>The Application uses local device storage (AsyncStorage) to save your preferences and data. The Application does not use browser cookies, advertising trackers, or cross-app tracking technologies. Firebase SDKs may collect anonymised usage statistics in accordance with Google's data processing terms. The Application contains no advertisements.</p>
-</div>
-
-<div class="section">
-<strong>Data Sharing</strong>
-<p>The Service Provider does not sell, trade, or rent your personal information to third parties. Your information may be disclosed only in the following circumstances:</p>
-<ul>
-  <li>As required by law, such as to comply with a subpoena or similar legal process</li>
-  <li>When necessary to protect rights, safety, or to investigate fraud</li>
-  <li>With trusted service providers (such as Google Firebase) who process data solely on behalf of the Service Provider under strict data processing agreements</li>
-</ul>
-</div>
-
-<div class="section">
-<strong>International Data Transfers</strong>
-<p>When cloud backup is enabled, your data may be stored on Google Firebase servers which may be located outside your country of residence. Google applies appropriate safeguards including Standard Contractual Clauses (SCCs) approved by the European Commission for international data transfers. For more information, see <a href="https://firebase.google.com/support/privacy" target="_blank" rel="noopener noreferrer">Firebase Privacy</a>.</p>
-</div>
-
-<div class="section">
-<strong>Data Retention</strong>
-<p>The Service Provider retains your data as follows:</p>
-<ul>
-  <li><strong>Local device data:</strong> Retained until you uninstall the Application or delete it manually</li>
-  <li><strong>Cloud backup data:</strong> Retained for the duration of your account plus 12 months after account deletion request</li>
-  <li><strong>Automatically collected usage data:</strong> Retained for up to 24 months</li>
-  <li><strong>Aggregated and anonymised data:</strong> Retained indefinitely as it no longer identifies you</li>
-</ul>
-<p>You may request deletion of your personal data at any time by contacting <a href="mailto:validocssupport@gmail.com">validocssupport@gmail.com</a>.</p>
-</div>
-
-<div class="section">
-<strong>Your Rights</strong>
-<p>You have the right to:</p>
-<ul>
-  <li>Access the personal data the Service Provider holds about you</li>
-  <li>Request correction of inaccurate or incomplete data</li>
-  <li>Request deletion of your personal data</li>
-  <li>Withdraw consent at any time where processing is based on consent</li>
-  <li>Data portability where applicable under law</li>
-  <li>Lodge a complaint with your local data protection authority</li>
-</ul>
-<p>To exercise any of these rights, contact <a href="mailto:validocssupport@gmail.com">validocssupport@gmail.com</a>.</p>
-</div>
-
-<div class="section">
-<strong>GDPR — Rights for EU/EEA Residents</strong>
-<p>If you are located in the European Economic Area (EEA), you have additional rights under the General Data Protection Regulation (GDPR) including the right to access, rectify, erase, restrict processing, object to processing, and data portability. The lawful basis for processing your data is your consent (for optional features such as cloud backup and Google Sign-In) and the performance of the service you requested. To exercise your GDPR rights, contact <a href="mailto:validocssupport@gmail.com">validocssupport@gmail.com</a>.</p>
-</div>
-
-<div class="section">
-<strong>Your California Privacy Rights (CalOPPA and CCPA/CPRA)</strong>
-<p>If you are a California resident, you have the right to know what personal information is collected about you, the right to delete personal information, the right to opt out of the sale or sharing of personal information, and the right to non-discrimination for exercising these rights. The Service Provider does not sell personal information. To exercise your California privacy rights, contact <a href="mailto:validocssupport@gmail.com">validocssupport@gmail.com</a>.</p>
-</div>
-
-<div class="section">
-<strong>Opt-Out and Data Deletion</strong>
-<p>You can stop all data collection by uninstalling the Application. To request deletion of your cloud backup data, contact <a href="mailto:validocssupport@gmail.com">validocssupport@gmail.com</a>. Local device data is deleted automatically when you uninstall the Application.</p>
-</div>
-
-<div class="section">
-<strong>Children</strong>
-<p>The Application is intended for users aged 18 and above and is designed for adult expats managing their personal and family documents. The Service Provider does not knowingly collect personally identifiable information from children under 13 years of age. If you are a parent or guardian and believe your child has provided personal information, please contact <a href="mailto:validocssupport@gmail.com">validocssupport@gmail.com</a> immediately and the information will be deleted.</p>
-</div>
-
-<div class="section">
-<strong>Security</strong>
-<p>The Service Provider implements appropriate technical and organisational safeguards to protect your personal information. Cloud data is protected by Firebase security rules ensuring each user can only access their own data. Authentication is handled securely by Firebase Authentication and Google Sign-In using industry-standard encryption. However, no method of transmission over the internet or electronic storage is 100% secure, and the Service Provider cannot guarantee absolute security.</p>
-</div>
-
-<div class="section">
-<strong>Data Breach Notification</strong>
-<p>In the event of a data breach that affects your personal data, the Service Provider will notify you in accordance with applicable legal requirements, including the nature of the breach and steps being taken to address it.</p>
-</div>
-
-<div class="section">
-<strong>Changes to This Policy</strong>
-<p>The Service Provider may update this Privacy Policy from time to time. You will be notified of material changes by an updated effective date in this policy. Continued use of the Application after changes are posted constitutes your acceptance of the updated policy. Previous versions are available upon request by contacting <a href="mailto:validocssupport@gmail.com">validocssupport@gmail.com</a>.</p>
-</div>
-
-<div class="section">
-<strong>Your Consent</strong>
-<p>Where processing is based on consent, you provide that consent by affirmatively opting in to the relevant feature or action (such as enabling cloud backup or signing in with Google). You may withdraw consent at any time without affecting processing carried out before withdrawal.</p>
-</div>
-
-<div class="section">
-<strong>Contact Us</strong>
-<p>If you have any questions about this Privacy Policy or your personal data, please contact:</p>
-<p>
-  <strong>Salman Aslam</strong><br>
-  Developer, ExpatWay - KSA Expat Companion<br>
-  Email: <a href="mailto:validocssupport@gmail.com">validocssupport@gmail.com</a>
-</p>
+  <p>
+    <strong>App:</strong> ExpatWay — KSA Expat Companion<br>
+    <strong>Package:</strong> com.falaahlabs.validocs<br>
+    <strong>Developer:</strong> Falah Labs (Salman Aslam)<br>
+    <strong>Effective date:</strong> 30 July 2026<br>
+    <strong>Last updated:</strong> 30 July 2026
+  </p>
 </div>
 
 <hr>
-<p class="footer">This Privacy Policy is effective as of 2026-06-08 and applies to ExpatWay - KSA Expat Companion version 1.0.0 on Android.<br>
-Generated and maintained by Salman Aslam — Falah Labs.</p>
+
+<h2>The short version</h2>
+
+<div class="badge">
+  <strong>ExpatWay does not collect your data. There is no account, no sign-up, and no ExpatWay server.</strong>
+</div>
+
+<p>Everything you put into ExpatWay — your documents, their photos, your family members, your notes, your Ibadah record, your settings — is stored <strong>only on your own phone</strong>. None of it is transmitted to Falah Labs or to anyone else. We could not read it if we wanted to, because we never receive it.</p>
+
+<p>The only way any of your data leaves your phone is if <strong>you</strong> export a backup file and choose where to put it.</p>
+
+<hr>
+
+<h2>What Information We Collect</h2>
+
+<p><strong>We collect nothing.</strong></p>
+
+<p>ExpatWay has no user accounts, no registration, no login, no analytics SDK, no advertising SDK, no crash-reporting SDK, and no backend server of its own. We do not collect, receive, store, sell, rent or share:</p>
+
+<ul>
+  <li>your name, email address, phone number or any other identifier</li>
+  <li>your documents, document numbers, expiry dates or document photographs</li>
+  <li>your family or team members' details</li>
+  <li>your notes, tasks, calculations, favourites or bookmarks</li>
+  <li>your Ibadah Tracker record</li>
+  <li>your location</li>
+  <li>your device identifiers, advertising ID, contacts, call log, SMS or installed-app list</li>
+</ul>
+
+<p>Earlier versions of ExpatWay (up to 1.0.3) offered an optional account with cloud backup. <strong>That feature has been removed completely.</strong> There are no ExpatWay user accounts, and the databases that supported them have been deleted.</p>
+
+<h2>How We Use Your Information</h2>
+
+<p>We do not have your information, so there is nothing for us to use it for.</p>
+
+<p>Everything the app does with the data you enter happens on your device: calculating expiry status, scheduling reminders, working out prayer times, adding up a dependant fee, and drawing your Ibadah month.</p>
+
+<h2>Local Storage</h2>
+
+<p>All app data is written to your device's private application storage, which other apps cannot read.</p>
+
+<p>This includes:</p>
+
+<ul>
+  <li>Family and team members, including profile pictures</li>
+  <li>Documents, expiry dates, custom alert dates and document photographs</li>
+  <li>Notes and task lists, including due dates and reminders</li>
+  <li>Saved dependant-fee calculations</li>
+  <li>Starred government services and bookmarked news articles</li>
+  <li>Your Ibadah Tracker record</li>
+  <li>Which reminders you have switched on</li>
+  <li>Your event-alert preference and the filters it uses</li>
+  <li>Your theme (dark/light) and calendar (Gregorian/Hijri) preference</li>
+  <li>Small caches so the app works offline: recent weather, your city name, currency rates, cached news headlines and the events list</li>
+</ul>
+
+<p><strong>Uninstalling ExpatWay deletes all of it.</strong> You can also erase everything at any time from <strong>Settings ▸ Backup &amp; Restore ▸ Erase all app data</strong>. That action is immediate, permanent and cannot be undone by us, because we hold no copy.</p>
+
+<h2>Backup — A File That Belongs To You</h2>
+
+<p>ExpatWay's backup is <strong>a file you create and control</strong>, not a cloud service we operate.</p>
+
+<ul>
+  <li>Tapping <strong>Back up now</strong> produces a single <code>.ewbak</code> file containing your app data, including your document photographs and profile pictures.</li>
+  <li><strong>You choose where the file goes:</strong> your own Google Drive, a folder on your phone or SD card, or another app such as OneDrive, Dropbox, WhatsApp or email via the share sheet.</li>
+  <li>The file is <strong>never sent to Falah Labs</strong> and never passes through any server we control.</li>
+  <li>You may optionally protect the file with a <strong>password</strong>. It is then encrypted with AES-256, using a key derived from your password with PBKDF2-SHA256 and a random salt. <strong>There is no account and no password reset.</strong> If you forget the password, that file cannot be opened again — by us or by anyone.</li>
+  <li>Once the file is in your Google Drive, OneDrive, phone storage or a chat, it is governed by <strong>that</strong> service's privacy policy and your own settings there, not by this one.</li>
+</ul>
+
+<p>Restoring reads a file you select and replaces the data on your phone with its contents.</p>
+
+<h2>Google Sign-In — Used Only For Google Drive</h2>
+
+<p>If, and only if, you choose to back up to <strong>your own Google Drive</strong>, ExpatWay asks you to sign in with Google.</p>
+
+<div class="badge">
+  <strong>This does not create an ExpatWay account and is not used to identify you.</strong> It exists solely to obtain your permission to write a file to your Drive.
+</div>
+
+<ul>
+  <li>The scope requested is <strong>drive.file</strong> only. This grants access <strong>exclusively to files ExpatWay itself creates</strong>. ExpatWay cannot see, read, list or modify any other file, folder, photo or document in your Google Drive.</li>
+  <li>Backups are placed in a folder named <strong>ExpatWay Backups</strong> in your Drive. They are your files, in your account, under your control.</li>
+  <li>Your Google account email is stored on your device only, so the app can show you which account is connected. It is not transmitted anywhere.</li>
+  <li>You can disconnect at any time from <strong>Settings ▸ Backup &amp; Restore ▸ Back up now ▸ Disconnect</strong>, and revoke access entirely at <a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a>. Disconnecting does not delete backups already in your Drive — they remain yours.</li>
+</ul>
+
+<p>If you never use Google Drive backup, ExpatWay never asks you to sign in to anything.</p>
+
+<h2>Location</h2>
+
+<p>ExpatWay requests <strong>foreground location</strong> (while you are using the app) for exactly three purposes:</p>
+
+<ul>
+  <li><strong>Prayer times</strong> — calculating accurate Umm al-Qura prayer times for where you actually are</li>
+  <li><strong>Qibla</strong> — working out the direction of the Kaaba from your position</li>
+  <li><strong>Prayer-anchored reminders</strong> — Azkar, Surah Al-Mulk and the Ibadah Tracker nudge, which fire relative to Fajr, Asr or Isha, and the local weather and city name shown at the top of the home screen</li>
+</ul>
+
+<p>What happens to it:</p>
+
+<ul>
+  <li>Prayer times, Qibla direction and reminder times are <strong>calculated entirely on your device</strong>, using an offline astronomical library. No location is sent anywhere for these.</li>
+  <li>Your last-known coordinates are cached in the app's private storage so reminders can be re-armed without asking for your position again. They are not uploaded.</li>
+  <li>Your coordinates are sent to <strong>Open-Meteo</strong> (open-meteo.com) solely to fetch the current temperature for the home-screen weather chip. This request carries no identifier of any kind — no name, no account, no device ID.</li>
+  <li>Your coordinates are passed to your <strong>device's built-in geocoder</strong> (part of Android / Google Play services) to turn them into a city name such as "Riyadh". That is an operating-system service, subject to Google's own privacy policy.</li>
+  <li>ExpatWay never tracks your movements, never records a location history, and never uses location in the background.</li>
+</ul>
+
+<p><strong>Location is optional.</strong> Decline it and everything else in the app works normally; only prayer times, Qibla, the weather chip and the prayer-anchored reminders are unavailable.</p>
+
+<h2>Notifications</h2>
+
+<p>All notifications are <strong>local</strong> — scheduled by the app on your own device. ExpatWay has no push server and cannot send you anything from the outside.</p>
+
+<p>Notifications you may opt into:</p>
+
+<ul>
+  <li>Document expiry alerts, timed per document type, plus a 7-day and a same-day warning</li>
+  <li>Custom alert dates you set on an individual document</li>
+  <li>Due dates on tasks in Notes &amp; Tasks</li>
+  <li>Religion reminders: prayer times, Morning and Evening Azkar, Surah Al-Mulk, Friday Surah Al-Kahf, and the Ibadah Tracker nudge</li>
+  <li>Event alerts for events matching the filters you choose on the Events screen</li>
+</ul>
+
+<p>Every one of these is off until you turn it on, and each can be turned off individually. Notification content is generated on your device from your own data and is never transmitted.</p>
+
+<h2>Camera, Photos and Files</h2>
+
+<ul>
+  <li><strong>Camera</strong> — used only when you take a photo of a document, or open the QR / barcode scanner in Expat Tools. Photos are saved to the app's private storage. Scanned codes are shown to you and are never uploaded; a scanned web address is always displayed in full for you to confirm before anything opens.</li>
+  <li><strong>Photos / media</strong> — used only when you pick an existing image for a document or profile picture, and when you save an Ibadah month report or a generated PDF to your device.</li>
+  <li><strong>Files</strong> — used only when you choose where to save a backup, or select a backup file to restore.</li>
+</ul>
+
+<p>ExpatWay does not scan, index or upload your photo library. It accesses only the specific items you select.</p>
+
+<p>ExpatWay <strong>does not record audio</strong>. A microphone permission is declared by the standard camera component the app is built on; ExpatWay never requests it and never uses it.</p>
+
+<h2>Internet Connections The App Makes</h2>
+
+<p>ExpatWay works offline for almost everything. It makes these anonymous requests, none of which carries your identity or any of your data:</p>
+
+<div class="tablewrap">
+<table>
+  <thead>
+    <tr><th>Purpose</th><th>Service</th><th>What is sent</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Events list</td><td>GitHub Pages (validocssupport-maker.github.io)</td><td>Nothing — a plain file download</td></tr>
+    <tr><td>KSA news headlines</td><td>Google News RSS, Saudi Gazette RSS</td><td>A fixed search term. No personal data</td></tr>
+    <tr><td>Currency rates</td><td>open.er-api.com</td><td>Nothing — a fixed rates request</td></tr>
+    <tr><td>Weather</td><td>Open-Meteo</td><td>Approximate coordinates only (see Location)</td></tr>
+    <tr><td>Google Drive backup</td><td>Google Drive API</td><td>Only the backup file you asked to upload</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Opening a government service, an event page or a news article launches <strong>your own browser</strong>. From that point you are on that website and its privacy policy applies, not ours. Reporting an issue opens <strong>your own email app</strong> with the message pre-written — <strong>you</strong> press send, and no documents, photos or personal data are attached.</p>
+
+<h2>Cookies and Tracking Technologies</h2>
+
+<p>ExpatWay is a native mobile application. It uses <strong>no cookies, no web beacons, no pixels, no SDK-based analytics, no advertising identifiers and no cross-app or cross-site tracking</strong>. There is no advertising in the app.</p>
+
+<h2>Data Sharing</h2>
+
+<p><strong>We share nothing, because we hold nothing.</strong> We do not sell, rent, trade or disclose your personal information to anyone — not to advertisers, not to data brokers, not to partners.</p>
+
+<p>The only parties involved at all are:</p>
+
+<ul>
+  <li><strong>Google Play Services / Google Drive API</strong> — only if you choose Google Drive backup, and only for files ExpatWay itself created. Governed by <a href="https://policies.google.com/privacy">Google's Privacy Policy</a>.</li>
+  <li><strong>Google Play Console</strong> — Google provides Falah Labs with <strong>aggregate, anonymous</strong> statistics about installs, uninstalls, ratings and crashes as part of distributing on the Play Store. This is Google's standard developer reporting; it is not collected by ExpatWay, contains no personal data, and cannot be linked to an individual user by us.</li>
+</ul>
+
+<h2>International Data Transfers</h2>
+
+<p>ExpatWay does not transfer your personal data anywhere, because it does not send your personal data anywhere. Your data stays on your device unless you export a backup yourself. If you choose to store that backup in a cloud service, that service decides where the file is held — please see its own policy.</p>
+
+<h2>Data Retention</h2>
+
+<p>Falah Labs retains <strong>no user data</strong>, so there is nothing for us to keep or delete.</p>
+
+<p>Your own data is retained on your phone for exactly as long as you keep it there. It is removed when you delete the item, use <strong>Erase all app data</strong>, or uninstall the app.</p>
+
+<p>Backup files you have created are retained wherever <strong>you</strong> put them, until <strong>you</strong> delete them.</p>
+
+<h2>Your Rights</h2>
+
+<p>Because we hold no personal data, the usual rights of access, correction, deletion, restriction and portability are things you can exercise <strong>directly and immediately, without asking us</strong>:</p>
+
+<ul>
+  <li><strong>Access</strong> — everything is in the app in front of you</li>
+  <li><strong>Correction</strong> — edit any record at any time</li>
+  <li><strong>Deletion</strong> — delete any item, or erase everything from Settings ▸ Backup &amp; Restore</li>
+  <li><strong>Portability</strong> — export a complete backup file whenever you like, and take it wherever you want</li>
+  <li><strong>Objection / restriction</strong> — decline any permission, or turn any reminder off; the app keeps working</li>
+</ul>
+
+<p>If you have a question about this policy, contact us at <strong>expatwaysupport@gmail.com</strong>.</p>
+
+<h2>GDPR — Rights for EU/EEA and UK Residents</h2>
+
+<p>Where the General Data Protection Regulation (and the UK GDPR) applies, Falah Labs is not a data controller of any personal data of yours, because none is collected or received. Your data is processed <strong>only locally on your own device</strong>, under your own control.</p>
+
+<p>Should any processing be attributed to us, the lawful basis would be your consent, given by installing and using the app and by granting each optional permission — which you may withdraw at any time by revoking the permission in your device settings or by uninstalling.</p>
+
+<p>You retain your rights of access, rectification, erasure, restriction, portability and objection, and the right to lodge a complaint with your national supervisory authority. As set out above, these rights are exercisable by you directly within the app.</p>
+
+<h2>Your California Privacy Rights (CalOPPA and CCPA/CPRA)</h2>
+
+<ul>
+  <li>ExpatWay <strong>does not collect</strong> personal information as defined by the CCPA/CPRA.</li>
+  <li>ExpatWay <strong>has never sold or shared</strong> personal information, and does not do so now. We do not sell or share the personal information of minors under 16.</li>
+  <li>We collect no "sensitive personal information", and therefore have nothing to limit the use of.</li>
+  <li>We do not respond to browser Do Not Track signals because we do not track users across sites or apps in the first place.</li>
+  <li>Because we hold no personal information, there is nothing to disclose, delete or correct in response to a request. You may still contact us at <strong>expatwaysupport@gmail.com</strong> with any question.</li>
+  <li>You will never be discriminated against for exercising any privacy right.</li>
+</ul>
+
+<h2>Opt-Out and Data Deletion</h2>
+
+<p>There is no data collection to opt out of and no account to delete.</p>
+
+<p>To remove your data:</p>
+
+<ul>
+  <li>Open <strong>Settings ▸ Backup &amp; Restore ▸ Erase all app data</strong>, and confirm; or</li>
+  <li>Uninstall ExpatWay from your device.</li>
+</ul>
+
+<p>Either removes every member, document, photograph, note, saved calculation, Ibadah record and setting from the phone. It is permanent — there is no server copy for us to restore from. Any backup file you made is separate, and you delete it yourself from wherever you saved it.</p>
+
+<p>To revoke Google Drive access, use <strong>Disconnect</strong> in the app, and/or remove ExpatWay at <a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a>.</p>
+
+<h2>Children</h2>
+
+<p>ExpatWay is intended for adults managing residency and family documents in Saudi Arabia. It is not directed at children, and it is not designed for or marketed to children under 13.</p>
+
+<p>We do not knowingly collect personal information from children — we do not knowingly collect personal information from anyone. If a parent or guardian uses ExpatWay to track a child's documents, that information stays on the parent's own device and is never transmitted to us.</p>
+
+<h2>Security</h2>
+
+<ul>
+  <li>All data is held in your device's <strong>private application storage</strong>, which the Android sandbox prevents other apps from reading.</li>
+  <li>Backup files may be <strong>encrypted with AES-256</strong> using a password you choose, with the key derived via PBKDF2-SHA256 and a random per-file salt.</li>
+  <li>Google Drive uploads use <strong>HTTPS</strong>, with the narrowest available scope (drive.file).</li>
+  <li>Every network request the app makes uses <strong>HTTPS</strong>.</li>
+  <li>There is <strong>no server to breach</strong>, no user database, and no credentials of yours for anyone to steal from us — which is the strongest security property this app has.</li>
+</ul>
+
+<p>The security of your device itself — its lock screen, its encryption, who has physical access to it, and where you put your backup files — remains your responsibility.</p>
+
+<h2>Data Breach Notification</h2>
+
+<p>Falah Labs operates no server and holds no user data, so a breach of our systems could not expose your personal information.</p>
+
+<p>In the unlikely event that we became aware of a security issue <strong>in the app itself</strong> that could put user data at risk, we would publish a notice on this page and release a corrective update through the Google Play Store as quickly as possible, and in any case within 72 hours of becoming aware of it where a notification obligation applies.</p>
+
+<h2>Third Party Services</h2>
+
+<ul>
+  <li><strong>Google Play Services / Google Drive API</strong> — only for Google Drive backup, when you choose it. <a href="https://policies.google.com/privacy">Google Privacy Policy</a></li>
+  <li><strong>Google Play Store</strong> — distribution, and aggregate anonymous install and crash statistics. <a href="https://policies.google.com/privacy">Google Privacy Policy</a></li>
+  <li><strong>Open-Meteo</strong> — weather for the home-screen chip, from approximate coordinates with no identifier. <a href="https://open-meteo.com/en/terms">Open-Meteo Privacy</a></li>
+  <li><strong>Google News RSS and Saudi Gazette RSS</strong> — public headline feeds, fetched with a fixed search term</li>
+  <li><strong>open.er-api.com</strong> — public currency reference rates</li>
+  <li><strong>GitHub Pages</strong> — hosts the events list this app downloads, and this policy page</li>
+</ul>
+
+<p>ExpatWay contains <strong>no advertising network and no analytics SDK of any kind</strong>.</p>
+
+<h2>Changes to This Policy</h2>
+
+<p>We may update this policy when the app changes. The <strong>Effective date</strong> at the top will be updated, and material changes will be described in the app's Play Store release notes.</p>
+
+<p>Your continued use of ExpatWay after a change means you accept the updated policy. Since no data is collected either before or after any such change, no previously collected data can be affected by one.</p>
+
+<h2>Your Consent</h2>
+
+<p>By using ExpatWay you consent to this Privacy Policy. Each optional capability — location, notifications, camera, photos, Google Drive — asks for your permission separately, and you can decline or revoke any of them at any time in your device settings without losing the rest of the app.</p>
+
+<h2>Contact Us</h2>
+
+<p>Questions, concerns or a privacy request:</p>
+
+<p>
+  <strong>Email:</strong> expatwaysupport@gmail.com<br>
+  <strong>Developer:</strong> Falah Labs — Salman Aslam<br>
+  <strong>App:</strong> ExpatWay — KSA Expat Companion (com.falaahlabs.validocs)
+</p>
+
+<p>You can also reach us from inside the app: <strong>Settings ▸ Report an Issue</strong>.</p>
+
+<hr>
+
+<p class="footer">ExpatWay is built on a simple principle: your papers are yours.<br>
+The app has no account because it does not need one, and no server because it should not have one.</p>
 
 </body>
 </html>
