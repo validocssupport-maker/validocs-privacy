@@ -1,0 +1,22 @@
+
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Fails non-zero if a source yields nothing — see the guard at the bottom
+      # of the script. A failed run leaves the previous events.json live.
+      - name: Scrape and build events.json
+        run: node scripts/build-events.mjs
+
+      - name: Commit if changed
+        run: |
+          if git diff --quiet -- events.json; then
+            echo "No change to events.json"
+            exit 0
+          fi
+          git config user.name  "events-bot"
+          git config user.email "actions@github.com"
+          git add events.json
+          git commit -m "Update events feed ($(date -u +%Y-%m-%d))"
+          git push
