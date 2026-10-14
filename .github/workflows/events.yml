@@ -1,11 +1,7 @@
 name: Update events feed
 
 on:
-  schedule:
-    # 03:00 UTC on the 1st of every month. The app caches for 30 days, so
-    # anything more frequent is just re-downloading the same bytes.
-    - cron: '0 3 1 * *'
-  workflow_dispatch: {}     # so it can be run by hand from the Actions tab
+  workflow_dispatch: {}     # manual only: eyeofriyadh blocks GitHub runner IPs (403). Monthly refresh runs from the owner's PC.
 
 permissions:
   contents: write           # needed to commit events.json back
